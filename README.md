@@ -132,6 +132,3 @@ As I was reading the posts, I have observed recurring themes. The goal is to rep
 # Group inclusion
 * [String belongs to a small set](https://lemire.me/blog/2022/12/30/quickly-checking-that-a-string-belongs-to-a-small-set)
 * [Absence of a string (AVX)](https://lemire.me/blog/2022/12/15/checking-for-the-absence-of-a-string-naive-avx-512-edition)
-
-# Validate
-* [Unicode validation](https://lemire.me/blog/2020/10/20/ridiculously-fast-unicode-utf-8-validation/)
