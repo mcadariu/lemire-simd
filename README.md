@@ -118,16 +118,43 @@ As I was reading the posts, I have observed recurring themes. The goal is to rep
 
 # Filter
 * [Filtering numbers (SVE)](https://lemire.me/blog/2022/07/14/filtering-numbers-faster-with-sve-on-amazon-graviton-3-processors/)
+  * remove all negative integers from an array
+  * basically uses the "compact" instruction
 
 # Prefix minimum
 
 * [Prefix minimum](https://lemire.me/blog/2023/08/10/coding-of-domain-names-to-wire-format-at-gigabytes-per-second)
+  * prefix-min trick
+    Byte index	Char	Dot?	Running count
+     0	w	no	1
+     1	w	no	2
+     2	w	no	3
+     3	.	yes	0
+     4	e	no	1
 
 # Summarize 
-* [Computing the UTF-8 size of a Latin 1 string (NEON)](https://lemire.me/blog/2023/05/15/computing-the-utf-8-size-of-a-latin-1-string-quickly-arm-neon-edition/)
 * [Computing the UTF-8 size of a Latin 1 string (AVX)](https://lemire.me/blog/2023/02/16/computing-the-utf-8-size-of-a-latin-1-string-quickly-avx-edition/)
-* [Counting the number of matching chars in two ASCII strings](https://lemire.me/blog/2021/05/21/counting-the-number-of-matching-characters-in-two-ascii-strings)
+  * size_t avx2_utf8_length_basic(const uint8_t *str, size_t len) {
+  size_t answer = len / sizeof(__m256i) * sizeof(__m256i);
+  size_t i;
+  for (i = 0; i + sizeof(__m256i) <= len; i += 32) {
+    __m256i input = _mm256_loadu_si256((const __m256i *)(str + i));
+   answer += __builtin_popcount(_mm256_movemask_epi8(input));
+  }
+  return answer + scalar_utf8_length(str + i, len - i);
+}
 
-# Group inclusion
-* [String belongs to a small set](https://lemire.me/blog/2022/12/30/quickly-checking-that-a-string-belongs-to-a-small-set)
+* [Counting the number of matching chars in two ASCII strings (SWAR)](https://lemire.me/blog/2021/05/21/counting-the-number-of-matching-characters-in-two-ascii-strings)
+  * uint64_t matching_bytes_in_word(uint64_t x, uint64_t y)
+  * { uint64_t xor_xy = x ^ y;
+  * const uint64_t t0 = (~xor_xy & 0x7f7f7f7f7f7f7f7fllu) + 0x0101010101010101llu;
+  * const uint64_t t1 = (~xor_xy & 0x8080808080808080llu); uint64_t zeros = t0 & t1;
+  * return ((zeros >> 7) * 0x0101010101010101ULL) >> 56;
+  * }
+
+# Absence of a string 
 * [Absence of a string (AVX)](https://lemire.me/blog/2022/12/15/checking-for-the-absence-of-a-string-naive-avx-512-edition)
+  * Load 64 bytes from our input document, compare them against 64 copies of the first character of the target string.
+  * If we find a match, load the second character of the target string, copy it 64 times within a register. Load 64 bytes from our input document, with an offset of one byte.
+  * Repeat as needed for the second, third, and so forth characters…
+  * Then advance in the input by 64 bytes and repeat.
