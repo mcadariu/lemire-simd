@@ -8,7 +8,6 @@ As I was reading the posts, I have observed recurring themes. The goal is to rep
 - [Prefix minimum](#prefix-minimum)
 - [Summarize](#summarize)
 - [Group inclusion](#group-inclusion)
-- [Validate](#validate)
 
 # Convert
 
