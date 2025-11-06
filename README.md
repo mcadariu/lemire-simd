@@ -1,5 +1,5 @@
 [Daniel Lemire's](https://lemire.me/blog/) and [Wojciech Muła's](http://0x80.pl/) blogs are great resources full of common problems and (very) efficient solutions (most often SIMD-based) encountered in the data processing domain.
-Below is a categorization organized by operation type, with SIMD techniques grouped within each category. I'm reimplementing a couple of them in Rust to get the hang of it.
+Below is a categorization organized by operation type. I'm reimplementing a couple of them in Rust to get the hang of they work.
 
 - [String Transformations](#string-transformations)
 - [Character & Pattern Detection](#character--pattern-detection)
