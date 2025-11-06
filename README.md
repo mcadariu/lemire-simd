@@ -95,7 +95,7 @@ Below is a categorization organized by operation type. I'm reimplementing a coup
 ### SWAR
 * [Integers to fixed digits](https://lemire.me/blog/2021/11/18/converting-integers-to-fix-digit-representations-quickly/)
 
-### Other/Scalar
+### Other
 * [Packing string of digits into integer](https://lemire.me/blog/2023/07/07/packing-a-string-of-digits-into-an-integer-quickly)
 
 ---
@@ -107,7 +107,7 @@ Below is a categorization organized by operation type. I'm reimplementing a coup
 
 ---
 
-# Aggregation & Analysis
+# Aggregation
 
 ### AVX-512
 * [Computing UTF-8 size of Latin-1 string](https://lemire.me/blog/2023/02/16/computing-the-utf-8-size-of-a-latin-1-string-quickly-avx-edition/)
