@@ -79,8 +79,10 @@ Below is a categorization organized by operation type. I'm reimplementing a coup
 ### Timestamps
 * [Parsing timestamps (SIMD)](https://lemire.me/blog/2023/07/01/parsing-time-stamps-faster-with-simd-instructions)
 
-### Network Data
+### IP
 * [Parsing IP addresses](https://lemire.me/blog/2023/06/08/parsing-ip-addresses-crazily-fast/)
+
+### Domain names
 * [Domain names to wire format (prefix minimum)](https://lemire.me/blog/2023/08/10/coding-of-domain-names-to-wire-format-at-gigabytes-per-second)
 
 ---
