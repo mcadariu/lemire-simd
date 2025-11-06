@@ -2,7 +2,6 @@ use std::time::Instant;
 use scratchpad::line_feed_every_k_bytes::{insert_line_feed_neon, insert_line_feed_scalar};
 
 fn bench_with_timing(name: &str, f: impl Fn() -> Vec<u8>, iterations: usize) -> (f64, usize) {
-    // Warmup
     for _ in 0..10 {
         std::hint::black_box(f());
     }
@@ -31,10 +30,9 @@ fn bench_with_timing(name: &str, f: impl Fn() -> Vec<u8>, iterations: usize) -> 
 }
 
 fn main() {
-    println!("=== Line Feed Insertion Benchmarks (ARM NEON) ===\n");
+    println!("Line Feed Insertion Benchmarks (ARM NEON)\n");
 
-    // Large input: 1 MB
-    println!("--- Large input (1 MB, K=64) ---");
+    println!("Large input (1 MB, K=64)");
     let large_input: Vec<u8> = (0..1_000_000).map(|i| (i % 256) as u8).collect();
     let iterations_large = 1_000;
 
@@ -51,8 +49,7 @@ fn main() {
     );
     println!();
 
-    // Very large input: 10 MB
-    println!("--- Very large input (10 MB, K=64) ---");
+    println!("Very large input (10 MB, K=64)");
     let very_large_input: Vec<u8> = (0..10_000_000).map(|i| (i % 256) as u8).collect();
     let iterations_very_large = 100;
 
@@ -69,8 +66,7 @@ fn main() {
     );
     println!();
 
-    // Test different K values with 1 MB input
-    println!("--- Different K values (1 MB input) ---");
+    println!("Different K values (1 MB input)");
     let test_input: Vec<u8> = (0..1_000_000).map(|i| (i % 256) as u8).collect();
 
     for k in [32, 64, 72, 128] {
