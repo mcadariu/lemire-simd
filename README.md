@@ -1,2 +1,160 @@
 [Daniel Lemire's](https://lemire.me/blog/) and [Wojciech Muła's](http://0x80.pl/) blogs are great resources full of common problems and (very) efficient solutions (most often SIMD-based) encountered in the data processing domain. 
-As I was reading the posts, I have observed recurring solutions, potentially you can even call them _patterns_. The goal is to reproduce them on my laptop and gather them in this repo. 
+As I was reading the posts, I have observed recurring themes. The goal is to reproduce them on my laptop and gather them in this repo as a quick index of "recipes". 
+
+- [Convert](#convert)
+- [Search](#search)
+- [Parse](#parse)
+- [Filter](#filter)
+- [Prefix minimum](#prefix-minimum)
+- [Summarize](#summarize)
+- [Group inclusion](#group-inclusion)
+
+# Convert
+
+* [ASCII to lower case (AVX)](https://lemire.me/blog/2024/08/03/converting-ascii-strings-to-lower-case-at-crazy-speeds-with-avx-512)
+  * load 'A' and 'Z' into regs
+  * create mask with elements already uppercase (compare input to A and Z, then do an AND with both)
+  * add difference between 'A' and 'a' to elements according to mask
+* [Packing a string of digits into an integer](https://lemire.me/blog/2023/07/07/packing-a-string-of-digits-into-an-integer-quickly)
+  * leverage fact that '2' is 0x32
+  * mask to get the high nibbles, 0x32 -> 2
+  * shuffle with table that reorders and eliminates ' '; you then have 0x00  0x01  0x09  0x02...
+  * shift to create empty space (zeros) where the other digit will go, then OR fills that space without destroying the original digit.
+  * narrow from 16-bit to 8-bit
+  * extract 64 bit integer
+* [Trimming spaces from strings (SVE)](https://lemire.me/blog/2023/03/10/trimming-spaces-from-strings-faster-with-sve-on-an-amazon-graviton-3-processor/)
+  * Get vector width in 32-bit elements
+  * Load bytes, extend to 32-bit
+  * Compare not-equal, create predicate mask
+  * Pack elements where mask=1 (removes gaps using compact)
+  * Store low bytes
+  * Count 1-bits in predicate mask
+  * Create mask for range [start, end) to process leftover
+* [Removing chars from strings (AVX)](https://lemire.me/blog/2022/04/28/removing-characters-from-strings-faster-with-avx-512)
+  * detect where whitespace is, create a mask, compress, popcnt to know how much to advance 
+* [Integers to decimal strings (AVX)](https://lemire.me/blog/2022/03/28/converting-integers-to-decimal-strings-faster-with-avx-512)
+* [Integers to fix digits (SWAR)](https://lemire.me/blog/2021/11/18/converting-integers-to-fix-digit-representations-quickly/)
+* [Removing duplicates](https://lemire.me/blog/2017/04/10/removing-duplicates-from-lists-quickly/)
+  * work in batches of 8, “ov and nv”; we need a RECONSTRUCTION vector (last element from ov and first 7 from new) - you do it with BLEND (takes 2 vectors and a mask)
+  * compare recon with nv, store in a mask
+  * population count to know how many unique (to know how many we write to output)
+  * uniqshuf[M] is a pre-computed lookup table that contains shuffle masks (SHUFFLE MASKS)
+  * Example 3: `M = 0b00010100` (Bits 2 and 4 set) **Meaning**: Positions 2 and 4 are duplicates **Input** `nv`: `[10, 11, 11, 12, 12, 13, 14, 15]` - Position 2: `11` (duplicate) - Position 4: `12` (duplicate) **Shuffle mask** `uniqshuf[20]`: (20 =   		0b00010100) ``` [0, 1, 3, 5, 6, 7, 7, 7] // Skip indices 2 and 4 
+
+### With insertion (intermediate step: slots)
+* [Escaping strings (AVX)](https://lemire.me/blog/2022/09/14/escaping-strings-faster-with-avx-512)
+  * get '\' and '"' into registers 
+  * load and expand input with 0 every other byte to make space
+  * create masks of where \ and " appear
+  * create to_keep mask of above mask or 0xAAAAAAAA (010101...) - because we will shift 
+  * shift (now \ can be placed before the char of interest) and blend with is quote or \ to get the escaped (still has 0's)
+  * compress result to remove the 0 we don't need anymore (inputs: to_keep and escaped) 
+  * advance the output pointer with with the number of written bytes (to know how many, do popcnt of to_keep)
+
+### Decode / Transcode / Encode
+
+* [Decoding Base16 sequences](https://lemire.me/blog/2023/07/27/decoding-base16-sequences-quickly)
+  * load 16 chars
+  * subtract 1 from each
+  * extract high nibble (shift right 4, and with 0x0f
+  * vectorised lookup (invalid will return "enough" to set MSB to 1, valid just small adjustment)
+  * another lookup to get actual hex value
+  * fused multiply-add
+  * lastly, pack to obtain the result 
+* [Latin 1 to UTF-8 (AVX)](https://lemire.me/blog/2023/08/18/transcoding-latin-1-strings-to-utf-8-strings-at-12-gb-s-using-avx-512)
+* [UTF-8 to Latin 1 (AVX)](https://lemire.me/blog/2023/08/12/transcoding-utf-8-strings-to-latin-1-strings-at-12-gb-s-using-avx-512)
+* [Base16 encoding](https://lemire.me/blog/2022/12/23/fast-base16-encoding)
+  * extract high and low nibbles
+  * interleave them from 4A and 3F to [0x04, 0x0A, 0x03, 0x0F..]
+  * use lookup table to convert
+* [Binary in ASCII (SWAR)](https://lemire.me/blog/2020/05/02/encoding-binary-in-ascii-very-fast)
+* [Bitset decoding (AVX)](https://lemire.me/blog/2022/05/06/fast-bitset-decoding-using-intel-avx-512)
+  * use compress (_mm512_mask_compressstoreu_epi32) using a shifting mask (e.g. at second iteration mask = (bits >> 16) & 0xFFFF) 
+
+# Search
+
+* [Control chars (SWAR)](https://lemire.me/blog/2025/04/13/detect-control-characters-quotes-and-backslashes-efficiently-using-swar/)
+* [Identifiers (NEON)](https://lemire.me/blog/2023/09/04/locating-identifiers-quickly-arm-neon-edition)
+  * use a 256-element table where allowed leading characters have a set value (say 255), non-identifier characters have the value 0, and all other characters have a non-zero, non-255 value.
+  * have to use both high and low nibbles for classification
+  * bitmask processing - convert SIMD results to bitmasks for boundary detection
+  * shift trick - (mask << 1) helps find identifier starts
+* [String prefixes (SIMD)](https://lemire.me/blog/2023/07/14/recognizing-string-prefixes-with-simd-instructions/)
+  * detect where separator starts
+  * zero out everything after separator
+  * compute hash and use it in lookup table containing the hash of the prefixes
+* [JSON escapable chars (SWAR)](https://lemire.me/blog/2025/04/13/detect-control-characters-quotes-and-backslashes-efficiently-using-swar/)
+  * the idea is to check if a byte is smaller than 32, equal to 34 or 92, for example uint64_t lt32 = (x - 0x2020202020202020ULL);
+* [Identifying sequence of digits in string](https://lemire.me/blog/2018/09/30/quickly-identifying-a-sequence-of-digits-in-a-string-of-characters)
+  * similar to above
+
+### Scan
+
+* [HTML](https://lemire.me/blog/2024/07/05/scan-html-faster-with-simd-instructions-net-c-edition)
+  * make a lookup with the low nibbles (there are not many you look for so low is enough)
+  * extract lower nibbles from all
+  * detect position where low nibbles match
+  * tag each position with a number
+  * keep only tags that where there was a match
+  * find biggest tag that survived
+  * calculate the position = 16-biggest_tag
+* [HTML](https://lemire.me/blog/2024/07/20/scan-html-even-faster-with-simd-instructions-c-and-c)
+* [HTML](https://lemire.me/blog/2024/06/08/scan-html-faster-with-simd-instructions-chrome-edition)
+
+# Parse 
+
+### Numbers
+* [Integers (AVX)](https://lemire.me/blog/2023/09/22/parsing-integers-quickly-with-avx-512)
+  * subtract 40 from the ASCII value to get the digit
+  * use fused multiply-add to combine
+* [Floating point](https://lemire.me/blog/2021/02/22/parsing-floating-point-numbers-really-fast-in-c)
+* [String of digit into integer (SWAR)](https://lemire.me/blog/2022/01/21/swar-explained-parsing-eight-digits)
+
+### Timestamps
+* [Timestamps](https://lemire.me/blog/2023/07/01/parsing-time-stamps-faster-with-simd-instructions)
+
+### IPs
+* [IPs](https://lemire.me/blog/2023/06/08/parsing-ip-addresses-crazily-fast/)
+
+# Filter
+* [Filtering numbers (SVE)](https://lemire.me/blog/2022/07/14/filtering-numbers-faster-with-sve-on-amazon-graviton-3-processors/)
+  * remove all negative integers from an array
+  * basically uses the "compact" instruction
+
+# Prefix minimum
+
+* [Prefix minimum](https://lemire.me/blog/2023/08/10/coding-of-domain-names-to-wire-format-at-gigabytes-per-second)
+  * prefix-min trick
+    Byte index	Char	Dot?	Running count
+     0	w	no	1
+     1	w	no	2
+     2	w	no	3
+     3	.	yes	0
+     4	e	no	1
+
+# Summarize 
+* [Computing the UTF-8 size of a Latin 1 string (AVX)](https://lemire.me/blog/2023/02/16/computing-the-utf-8-size-of-a-latin-1-string-quickly-avx-edition/)
+  * size_t avx2_utf8_length_basic(const uint8_t *str, size_t len) {
+  size_t answer = len / sizeof(__m256i) * sizeof(__m256i);
+  size_t i;
+  for (i = 0; i + sizeof(__m256i) <= len; i += 32) {
+    __m256i input = _mm256_loadu_si256((const __m256i *)(str + i));
+   answer += __builtin_popcount(_mm256_movemask_epi8(input));
+  }
+  return answer + scalar_utf8_length(str + i, len - i);
+}
+
+* [Counting the number of matching chars in two ASCII strings (SWAR)](https://lemire.me/blog/2021/05/21/counting-the-number-of-matching-characters-in-two-ascii-strings)
+  * uint64_t matching_bytes_in_word(uint64_t x, uint64_t y)
+  * { uint64_t xor_xy = x ^ y;
+  * const uint64_t t0 = (~xor_xy & 0x7f7f7f7f7f7f7f7fllu) + 0x0101010101010101llu;
+  * const uint64_t t1 = (~xor_xy & 0x8080808080808080llu); uint64_t zeros = t0 & t1;
+  * return ((zeros >> 7) * 0x0101010101010101ULL) >> 56;
+  * }
+
+# Absence of a string 
+* [Absence of a string (AVX)](https://lemire.me/blog/2022/12/15/checking-for-the-absence-of-a-string-naive-avx-512-edition)
+  * Load 64 bytes from our input document, compare them against 64 copies of the first character of the target string.
+  * If we find a match, load the second character of the target string, copy it 64 times within a register. Load 64 bytes from our input document, with an offset of one byte.
+  * Repeat as needed for the second, third, and so forth characters…
+  * Then advance in the input by 64 bytes and repeat.
