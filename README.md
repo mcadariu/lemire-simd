@@ -21,9 +21,6 @@ Below is an attempt at a "categorization". I'm reimplementing a couple of them i
 ### SVE (ARM)
 * [Trimming spaces from strings](https://lemire.me/blog/2023/03/10/trimming-spaces-from-strings-faster-with-sve-on-an-amazon-graviton-3-processor/)
 
-### Other/Scalar
-* [Removing duplicates from lists](https://lemire.me/blog/2017/04/10/removing-duplicates-from-lists-quickly/)
-
 ---
 
 # Character & Pattern Detection
@@ -102,8 +99,11 @@ Below is an attempt at a "categorization". I'm reimplementing a couple of them i
 
 # Filtering & Selection
 
-### SVE (ARM)
+### Filtering numbers
 * [Filtering numbers](https://lemire.me/blog/2022/07/14/filtering-numbers-faster-with-sve-on-amazon-graviton-3-processors/)
+
+### Duplicates
+* [Removing duplicates from lists](https://lemire.me/blog/2017/04/10/removing-duplicates-from-lists-quickly/)
 
 ---
 
