@@ -1,4 +1,4 @@
-[Daniel Lemire's](https://lemire.me/blog/) blog are great resources full of common problems and (very) efficient solutions (most often SIMD-based) encountered in the data processing domain.
+[Daniel Lemire's](https://lemire.me/blog/) blog is full of common problems and (very) efficient solutions (most often SIMD-based) encountered in the data processing domain.
 Below is a categorization organized by operation type. I'm reimplementing a couple of them in Rust to get the hang of they work.
 
 - [String Transformations](#string-transformations)
