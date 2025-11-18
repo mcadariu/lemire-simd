@@ -1,3 +1,28 @@
+/*
+Line Feed Insertion every K bytes
+
+Large input (1 MB, K=64)
+Scalar (large):                57.98 ms total, 17.52 GB/s throughput
+NEON (large):                  23.36 ms total, 43.49 GB/s throughput
+
+Very large input (10 MB, K=64)
+Scalar (very large):           38.16 ms total, 26.61 GB/s throughput
+NEON (very large):             23.79 ms total, 42.69 GB/s throughput
+
+Different K values (1 MB input)
+Scalar (K=32):                 67.30 ms total, 7.66 GB/s throughput
+NEON (K=32):                   11.57 ms total, 44.58 GB/s throughput
+
+Scalar (K=64):                 18.47 ms total, 27.49 GB/s throughput
+NEON (K=64):                   11.62 ms total, 43.70 GB/s throughput
+
+Scalar (K=72):                 17.85 ms total, 28.40 GB/s throughput
+NEON (K=72):                   22.09 ms total, 22.95 GB/s throughput
+
+Scalar (K=128):                15.09 ms total, 33.38 GB/s throughput
+NEON (K=128):                  10.49 ms total, 48.03 GB/s throughput
+ */
+
 use std::arch::aarch64::*;
 
 pub static SHUFFLE_MASKS_NEON: [[u8; 16]; 16] = [
