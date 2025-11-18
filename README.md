@@ -1,5 +1,5 @@
-[Daniel Lemire's](https://lemire.me/blog/) and [Wojciech Muła's](http://0x80.pl/) blogs are great resources full of common problems and (very) efficient solutions (most often SIMD-based) encountered in the data processing domain.
-Below is a categorization organized by operation type. I'm reimplementing a couple of them in Rust to get the hang of they work.
+[Daniel Lemire's](https://lemire.me/blog/) blog is full of common problems and (very) efficient solutions (most often SIMD-based) encountered in the data processing domain.
+Below is an attempt at a "categorization". I'm reimplementing a couple of them in Rust to get the hang of they work.
 
 - [String Transformations](#string-transformations)
 - [Character & Pattern Detection](#character--pattern-detection)
@@ -20,9 +20,6 @@ Below is a categorization organized by operation type. I'm reimplementing a coup
 
 ### SVE (ARM)
 * [Trimming spaces from strings](https://lemire.me/blog/2023/03/10/trimming-spaces-from-strings-faster-with-sve-on-an-amazon-graviton-3-processor/)
-
-### Other/Scalar
-* [Removing duplicates from lists](https://lemire.me/blog/2017/04/10/removing-duplicates-from-lists-quickly/)
 
 ---
 
@@ -95,19 +92,22 @@ Below is a categorization organized by operation type. I'm reimplementing a coup
 ### SWAR
 * [Integers to fixed digits](https://lemire.me/blog/2021/11/18/converting-integers-to-fix-digit-representations-quickly/)
 
-### Other/Scalar
+### Other
 * [Packing string of digits into integer](https://lemire.me/blog/2023/07/07/packing-a-string-of-digits-into-an-integer-quickly)
 
 ---
 
 # Filtering & Selection
 
-### SVE (ARM)
+### Filtering numbers
 * [Filtering numbers](https://lemire.me/blog/2022/07/14/filtering-numbers-faster-with-sve-on-amazon-graviton-3-processors/)
+
+### Duplicates
+* [Removing duplicates from lists](https://lemire.me/blog/2017/04/10/removing-duplicates-from-lists-quickly/)
 
 ---
 
-# Aggregation & Analysis
+# Aggregation
 
 ### AVX-512
 * [Computing UTF-8 size of Latin-1 string](https://lemire.me/blog/2023/02/16/computing-the-utf-8-size-of-a-latin-1-string-quickly-avx-edition/)
