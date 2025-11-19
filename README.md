@@ -1,5 +1,5 @@
 [Daniel Lemire's](https://lemire.me/blog/) blog is full of common problems and (very) efficient solutions (most often SIMD-based) encountered in the data processing domain.
-Below is an attempt at a "categorization" for easy access. In addition, I'm reimplementing a couple of them in Rust to get the hang of they work. I'm using ARM NEON intrinsics, which are built-in my MacBook Pro. I'm capturing the result of the benchmark on my laptop as a comment at the top of the files.
+Below is an attempt at a "categorization" for easy access. In addition, I'm reimplementing a couple of them in Rust to get the hang of they work. I'm using ARM NEON intrinsics, which are built-in my MacBook Pro. I'm capturing the result of the benchmark on my laptop as a comment at the top of the source files.
 
 - [String Transformations](#string-transformations)
 - [Character & Pattern Detection](#character--pattern-detection)
