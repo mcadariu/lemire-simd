@@ -18,6 +18,10 @@ harness = false
 name = "json_escape_bench"
 harness = false
 
+[[bench]]
+name = "ascii_tolower_bench"
+harness = false
+
 [profile.release]
 opt-level = 3
 lto = true
