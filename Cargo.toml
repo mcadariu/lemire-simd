@@ -22,6 +22,14 @@ harness = false
 name = "ascii_tolower_bench"
 harness = false
 
+[[bench]]
+name = "escape_json_bench"
+harness = false
+
+[[bench]]
+name = "remove_chars_bench"
+harness = false
+
 [profile.release]
 opt-level = 3
 lto = true
