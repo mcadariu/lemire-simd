@@ -30,6 +30,10 @@ harness = false
 name = "remove_chars_bench"
 harness = false
 
+[[bench]]
+name = "timestamp_parser_bench"
+harness = false
+
 [profile.release]
 opt-level = 3
 lto = true
